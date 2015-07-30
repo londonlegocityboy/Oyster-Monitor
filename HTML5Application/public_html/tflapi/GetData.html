@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Collect data from TFL</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="../Data.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <h1>Collect TFL data and store locally</h1>
+        <div>Get data for 
+            <span id="uri" style="display: inline-block; height: 1.2em; width: 200px; border: 1px solid black; background: lightgreen;">/Line</span>
+            <button id="go-button" onclick="collectData()">Go</button>
+        </div>
+        <script>
+            var baseURI = "https://api.tfl.gov.uk";
+            var queryURI = "/Line";
+            var lineQuery = baseURI + queryURI;
+            var goButton = document.getElementById("go-button");
+            var uriSpan = document.getElementById("uri");
+            var xmlhttp =new XMLHttpRequest();
+            var individualLines = new Array();
+            var individualLinesIndex = 0;
+            var individualLinesArrivalsIndex = 0;
+            xmlhttp.onreadystatechange=function() {
+                if (xmlhttp.readyState===4 && xmlhttp.status===200) {
+                    localStorage.setItem( queryURI, xmlhttp.response);
+                    var response = JSON.parse(xmlhttp.response);
+                    alert('got it');
+                    if ( queryURI === "/Line" ) {
+                        processLines( response );
+                    }
+                    prepareNext();
+                }
+            };
+            function prepareNext() {
+                if ( (0===1) && ( individualLinesIndex < individualLines.length ) ) {
+                    goButton.removeAttribute('disabled');
+                    queryURI = "/Line/" + individualLines[individualLinesIndex];
+                    uriSpan.innerHTML = queryURI;
+                    individualLinesIndex++;
+                } else if (individualLinesArrivalsIndex < individualLines.length) {
+                    goButton.removeAttribute('disabled');
+                    queryURI = "/Line/" + individualLines[individualLinesArrivalsIndex] + "/Arrivals";
+                    uriSpan.innerHTML = queryURI;
+                    individualLinesArrivalsIndex++;
+                }
+            }
+            function processLines( lines ) {
+//                alert( lines.length + " " + lines[0].modeName );
+                for ( var i = 0; i < lines.length; i++ ) {
+                    var line = lines[i];
+                    if ( ( line.modeName === "london-overground" ) 
+                            || ( line.modeName === "national-rail")
+                            || ( line.modeName === "tube")
+                            || ( line.modeName === "overground")
+                            || ( line.modeName === "tflrail")
+                            || ( line.modeName === "dlr")
+                            || ( line.modeName === "tram")
+                            ){
+                        individualLines[individualLines.length] = line.id;
+                    } else if ( ( line.modeName === "bus" )
+                              || ( line.modeName === "river-bus" )
+                              || ( line.modeName === "river-tour" )
+                              || ( line.modeName === "cable-car" )
+                              ) {
+                    } else {
+                        alert(line.modeName);
+                    }
+                    
+                }
+                alert( "Lines to get: " + individualLines.length );
+            }
+            function collectData() {
+                if ( queryURI === "/Line" ) {
+                   var lines = getData("/Line");
+                   processLines( lines );
+                   prepareNext();
+                } else {
+                    goButton.setAttribute('disabled', 'true' );
+//                    queryURI = document.getElementById("uri").getAttribute("data-uri");
+                    query = baseURI + queryURI + "?app_id=6bb92835&app_key=bfcd58b96b57c6046b8367dbb278b472";
+                    alert(query);
+                    xmlhttp.open("GET",query,true);
+                    xmlhttp.send();
+                /*
+                */
+                }
+               
+            };
+        </script>                
+    </body>
+</html>

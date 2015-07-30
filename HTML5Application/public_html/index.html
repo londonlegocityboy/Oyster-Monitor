@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Oyster Monitor</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            * {
+                font-family: arial;
+            }
+            h1 {
+                border: solid 8px black;
+                color: white;
+                background: blue;
+                text-align: center;
+            }
+            #dev {
+                height: 96%;
+                width: 96%;
+                margin-top: 2%;
+                margin-bottom: 2%;
+/*
+                display: none;
+*/
+            }
+            #A3 {
+                overflow: scroll;
+            }
+            body {
+                background: #e6e6e6;
+            }
+            .corners { 
+                background: #f6f6f6;
+                height: 700px;
+                margin: 50px auto;
+                max-width: 600px;
+                position: relative;
+                width: 80%;
+                -webkit-box-shadow: 0 1px 7px hsla(0,0%,0%,.2);
+                -moz-box-shadow: 0 1px 7px hsla(0,0%,0%,.2);
+                box-shadow: 0 1px 7px hsla(0,0%,0%,.2);
+            }
+            /* Corner Effect */
+            .corners:after,
+            .corners:before {
+                background: #e6e6e6;
+                content: '';
+                height: 50px;
+                position: absolute;
+                top: -25px;
+                width: 100px;
+                -webkit-box-shadow: 0 5px 10px -7px hsla(0,0%,0%,.5);
+                -moz-box-shadow: 0 5px 10px -7px hsla(0,0%,0%,.5);
+                box-shadow: 0 5px 10px -7px hsla(0,0%,0%,.5);
+}
+.corners:after {
+    left: -50px;
+    -webkit-transform: rotate(-45deg);
+       -moz-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+         -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+}
+.corners:before {
+    right: -50px;
+    -webkit-transform: rotate(45deg);
+       -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+         -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+}
+        </style>
+    </head>
+    <body>
+        <h1>Oyster Monitor</h1>
+        <div class="corners">
+            Content
+        </div>
+        <div>TODO write content</div>
+        <div id="dev">
+        <div id="A1">TODO write content</div>
+        <div id="A2">TODO write content</div>
+        <div id="A3">TODO write content</div>
+        <div id="A4">TODO write content</div>
+        </div>
+        <div onclick="loadXMLDoc('');" style="background: highlight; cursor: pointer;">Do it!</div>
+    <script type="text/javascript" src="json-to-table.js"></script>
+        <!--
+        -->
+        <script>
+function to_li(obj, name) {
+    var li = document.createElement("li");
+    if (typeof(name) !== "undefined") {
+        var strong = document.createElement("strong");
+        strong.appendChild(document.createTextNode(name + ": "));
+        li.appendChild(strong);
+    }
+    if (typeof(obj) !== "object"){
+        li.appendChild(document.createTextNode(obj));
+    } else {
+        var ul = document.createElement ("ul");
+        for (var prop in obj){
+            ul.appendChild(to_li(obj[prop],prop));
+        }
+        li.appendChild(ul);
+    }
+    return li;
+}            
+        </script>
+        
+        <script>
+        latit = 51.5148872;
+        longit = -0.0617336;
+        r = 1000;
+        query = "https://api.tfl.gov.uk/StopPoint?lat=" + latit + "&lon=" + longit + "&stopTypes=NaptanMetroStation&radius=" + r + "&useStopPointHierarchy=True&&&returnLines=True&app_id=6bb92835&app_key=bfcd58b96b57c6046b8367dbb278b472";
+function loadXMLDoc(url)
+{
+var xmlhttp =new XMLHttpRequest();
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState===4 && xmlhttp.status===200)
+    {
+    document.getElementById('A1').innerHTML="status:" + xmlhttp.status;
+    document.getElementById('A2').innerHTML="status text:" + xmlhttp.statusText;
+//    document.getElementById('A4').innerHTML="response text:" + xmlhttp.responseText;
+    resp = JSON.parse(xmlhttp.response);
+    document.getElementById('A4').appendChild( to_li(resp), "resp");
+    
+    var jsonHtmlTable = ConvertJsonToTable(resp.stopPoints);
+      document.getElementById('A3').innerHTML= jsonHtmlTable;
+    }
+  };
+  xmlhttp.open("GET",query,true);
+xmlhttp.send();
+  }
+  /*
+        document.write(d.fromLocationDisambiguation.disambiguationOptions[0].place.commonName);
+        */
+    </script>
+    </body>
+</html>

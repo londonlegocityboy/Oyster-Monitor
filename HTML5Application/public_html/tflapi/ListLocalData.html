@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Oyster Monitor: Locally stored data</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="../Data.js" type="text/javascript"></script>
+        <style>
+            td:first-child {
+                width: 200;
+                overflow: hidden;
+                background: lightgreen;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Locally stored data</h1>
+        <div style="height: 400px; overflow: scroll;" id="table">
+        <table id="localData">
+        </table>
+        </div>
+        <div style="height: 400px; overflow: scroll;" id="tree">
+        </div>
+        <script>
+            var table = document.getElementById("localData");
+            var treeDiv = document.getElementById("tree");
+            var list = null;
+//            alert(localStorage.length);
+            for ( var i = 0; i < localStorage.length; i++ ) {
+                key = localStorage.key(i);
+                var tr = document.createElement("tr");
+                tr.innerHTML = "<td data-key='" + key + "' onclick='show(this)'>" + key + "</td>" + "<td nowrap style='overflow: hidden;'>" + localStorage.getItem(key) + "</td>";
+                table.appendChild(tr);
+            }
+            function show( src ) {
+                var key = src.getAttribute("data-key");
+                var data = JSON.parse(localStorage.getItem(key));
+                if ( list !== null ) {
+                    treeDiv.removeChild(list);
+                }
+                list = toTreeList( data, key );
+                treeDiv.appendChild(list);
+            }
+        </script>
+    </body>
+</html>

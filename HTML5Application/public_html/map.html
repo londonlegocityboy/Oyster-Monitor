@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript"
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqG8ycHQWO2OldLtYqcIBu3tMIEHg4ouI">
+        </script>
+    </head>
+    <body>
+        <div id="dev">
+            <div id="A1">response status</div>
+            <div id="A2">response status text</div>
+            <div id="A3" style="height: 200px; overflow-y: scroll;">response data</div>
+        </div>
+
+        <div id="map-canvas" style="width: 1000px; height: 600px;">TODO write content</div>
+        <script>
+            var map = null;
+            function initialize() {
+                var myLatlng = new google.maps.LatLng(51.5148872, -0.0617336);
+                var mapOptions = {
+                    zoom: 12,
+                    center: myLatlng
+                };
+//                var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+                map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,
+                    title: 'You are here!'
+                });
+            }
+            google.maps.event.addDomListener(window, 'load', initialize);
+        </script>
+
+        <script>
+            latit = 51.5148872;
+            longit = -0.0617336;
+            r = 1000;
+            query = "https://api.tfl.gov.uk/StopPoint?lat=" + latit + "&lon=" + longit + "&stopTypes=NaptanMetroStation&radius=" + r + "&useStopPointHierarchy=True&&&returnLines=True&app_id=6bb92835&app_key=bfcd58b96b57c6046b8367dbb278b472";
+            function loadTFLXMLDoc(url)
+            {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function ()
+                {
+                    if (xmlhttp.readyState === 4 && xmlhttp.status === 200)
+                    {
+                        document.getElementById('A1').innerHTML = "status:" + xmlhttp.status;
+                        document.getElementById('A2').innerHTML = "status text:" + xmlhttp.statusText;
+//    document.getElementById('A4').innerHTML="response text:" + xmlhttp.responseText;
+                        document.getElementById('A3').innerHTML = xmlhttp.response;
+
+                        resp = JSON.parse(xmlhttp.response);
+                        addMarkers( resp );
+                        /*
+                         document.getElementById('A4').appendChild(to_li(resp), "resp");
+                         var jsonHtmlTable = ConvertJsonToTable(resp.stopPoints);
+                         document.getElementById('A3').innerHTML = jsonHtmlTable;
+                         */
+                    }
+                };
+                xmlhttp.open("GET", query, true);
+                xmlhttp.send();
+            }
+            function addMarkers(data) {
+                alert(data.stopPoints.length);
+                for (var i = 0; i < data.stopPoints.length; i++ ) {
+                    var stopPoint = data.stopPoints[i];
+//                for (var stopPoint in data.stopPoints) {
+                    var latLon = new google.maps.LatLng(stopPoint.lat, stopPoint.lon);
+                    var title = stopPoint.commonName;
+                    alert(title);
+                    addMarker( latLon, title );
+                }
+            }
+            function addMarker( latLon, title ) {
+                var marker = new google.maps.Marker({
+                    position: latLon,
+                    map: map,
+                    title: title
+                });
+            }
+            /*
+             document.write(d.fromLocationDisambiguation.disambiguationOptions[0].place.commonName);
+             */
+            window.addEventListener("load", loadTFLXMLDoc, false );
+        </script>
+
+    </body>
+</html>
